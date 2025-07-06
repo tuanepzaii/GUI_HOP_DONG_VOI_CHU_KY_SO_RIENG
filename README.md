@@ -4,6 +4,7 @@ Trong bối cảnh chuyển đổi số và yêu cầu bảo mật thông tin ng
 Web ứng dụng được xây dựng bằng Flask – một micro framework của Python – có khả năng chạy trực tiếp trên trình duyệt. Qua đó, toàn bộ quá trình: ký hợp đồng, mã hóa, gửi dữ liệu, nhận và xác thực... đều có thể thao tác thông qua giao diện đơn giản, thân thiện.
 
 2. Trình bày kỹ thuật
+
 2.1 Ngôn ngữ và thư viện sử dụng
 Python 3.x
 
