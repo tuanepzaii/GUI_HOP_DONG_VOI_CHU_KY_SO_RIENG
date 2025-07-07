@@ -272,4 +272,10 @@ Sau khi cả SenderApp và ReceiverApp đều đang chạy và bạn đã truy c
 
 **•** Chạy verify_tool.py và dán các chuỗi này cùng với đường dẫn đến sender_public_key.pem để xác minh độc lập.
 
-Chúc bạn thành công với dự án của mình!
+## 🪪 Tác giả
+
+- **Họ tên:** Phạm Đình TuấnTuấn
+- **Lớp:** CNTT16-05
+- **Môn:** An toàn và Bảo mật thông tin
+- **GVHD:** Trần Đức Thắng
+
