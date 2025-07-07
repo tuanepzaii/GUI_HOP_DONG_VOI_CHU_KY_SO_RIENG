@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhận Hợp Đồng - Ứng Dụng Người Nhận</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+    #activity-log {
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen p-4">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-3xl font-extrabold text-center text-blue-700 mb-6 uppercase tracking-wider font-sans">📄 ỨNG DỤNG NGƯỜI NHẬN HỢP ĐỒNG</h1>
+
+
+    <!-- Quản lý khóa RSA -->
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold text-blue-600 mb-4">🔐 Quản Lý Khóa RSA</h2>
+      <div class="mb-4">
+        <button id="generate-keys-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full font-medium">Tạo Khóa Mới</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">🔑 Khóa Riêng Tư Người Nhận:</label>
+          <input type="file" id="receiver-private-key" accept=".pem" class="border p-2 rounded w-full">
+          <button id="load-receiver-private-key-btn" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full font-medium">Tải Khóa</button>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">🧷 Khóa Công Khai Người Gửi:</label>
+          <input type="file" id="sender-public-key" accept=".pem" class="border p-2 rounded w-full">
+          <button id="load-sender-public-key-btn" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full font-medium">Tải Khóa</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phần Khởi Động Server -->
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold text-blue-600 mb-4">🖥️ Khởi Động Server</h2>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">📌 Cổng Server:</label>
+        <input type="number" id="port" class="border p-2 rounded w-full" placeholder="Nhập cổng (ví dụ: 12345)">
+      </div>
+      <div class="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
+        <button id="start-server-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium w-full">Bắt Đầu Server</button>
+        <button id="stop-server-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-medium w-full">Dừng Server</button>
+      </div>
+    </div>
+
+    <!-- Nhật ký hoạt động -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold text-blue-600 mb-4">📝 Nhật Ký Hoạt Động</h2>
+      <pre id="activity-log" class="text-sm whitespace-pre-wrap bg-gray-100 border rounded p-3 h-48 overflow-y-auto"></pre>
+    </div>
+  </div>
+
+  <!-- Script giữ nguyên -->
+  <script>
+    function logMessage(message) {
+      const log = document.getElementById('activity-log');
+      log.textContent += message + '\n';
+      log.scrollTop = log.scrollHeight;
+    }
+
+    setInterval(async () => {
+      try {
+        const response = await fetch('/get_logs');
+        const result = await response.json();
+        const log = document.getElementById('activity-log');
+        log.textContent = result.logs.join('\n');
+        log.scrollTop = log.scrollHeight;
+      } catch (error) {
+        logMessage(`Lỗi lấy nhật ký: ${error}`);
+      }
+    }, 5000);
+
+    document.getElementById('generate-keys-btn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/generate_keys', { method: 'POST' });
+        const result = await response.json();
+        logMessage(result.message);
+        alert(result.message);
+      } catch (error) {
+        logMessage(`Lỗi khi tạo khóa: ${error}`);
+        alert(`Lỗi khi tạo khóa: ${error}`);
+      }
+    });
+
+    document.getElementById('load-receiver-private-key-btn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('receiver-private-key');
+      if (!fileInput.files.length) {
+        logMessage('Vui lòng chọn file khóa riêng tư.');
+        alert('Vui lòng chọn file khóa riêng tư.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      try {
+        const response = await fetch('/load_receiver_private_key', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        logMessage(result.message);
+        alert(result.message);
+      } catch (error) {
+        logMessage(`Lỗi khi tải khóa riêng tư: ${error}`);
+        alert(`Lỗi khi tải khóa riêng tư: ${error}`);
+      }
+    });
+
+    document.getElementById('load-sender-public-key-btn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('sender-public-key');
+      if (!fileInput.files.length) {
+        logMessage('Vui lòng chọn file khóa công khai.');
+        alert('Vui lòng chọn file khóa công khai.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      try {
+        const response = await fetch('/load_sender_public_key', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        logMessage(result.message);
+        alert(result.message);
+      } catch (error) {
+        logMessage(`Lỗi khi tải khóa công khai: ${error}`);
+        alert(`Lỗi khi tải khóa công khai: ${error}`);
+      }
+    });
+
+    document.getElementById('start-server-btn').addEventListener('click', async () => {
+      const port = document.getElementById('port').value;
+      if (!port) {
+        logMessage('Vui lòng nhập cổng.');
+        alert('Vui lòng nhập cổng.');
+        return;
+      }
+      try {
+        const response = await fetch('/start_server', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ port })
+        });
+        const result = await response.json();
+        logMessage(result.message);
+        alert(result.message);
+      } catch (error) {
+        logMessage(`Lỗi khi khởi động server: ${error}`);
+        alert(`Lỗi khi khởi động server: ${error}`);
+      }
+    });
+
+    document.getElementById('stop-server-btn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/stop_server', { method: 'POST' });
+        const result = await response.json();
+        logMessage(result.message);
+        alert(result.message);
+      } catch (error) {
+        logMessage(`Lỗi khi dừng server: ${error}`);
+        alert(`Lỗi khi dừng server: ${error}`);
+      }
+    });
+  </script>
+</body>
+</html>
