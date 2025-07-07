@@ -274,7 +274,7 @@ Sau khi cả SenderApp và ReceiverApp đều đang chạy và bạn đã truy c
 
 ## 🪪 Tác giả
 
-- **Họ tên:** Phạm Đình TuấnTuấn
+- **Họ tên:** Phạm Đình Tuấn
 - **Lớp:** CNTT16-05
 - **Môn:** An toàn và Bảo mật thông tin
 - **GVHD:** Trần Đức Thắng
